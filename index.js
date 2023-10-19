@@ -1,6 +1,7 @@
 const http = require("http");
 const fs = require("fs");
 const fastXmlParser = require('fast-xml-parser');
+const { time } = require("console");
 const host ='localhost';
 const port = 8000;
 const parser = new fastXmlParser.XMLParser();
@@ -26,7 +27,10 @@ function buildResponse(incomeTotalItem , OutComeTotalItem) {
   return responce;
 }
 
-
+function filterXmlData(banksincexpElements , fieldToFilter , itemid)
+{
+  return banksincexpElements.find((item)=>item[fieldToFilter] === itemid);
+}
 function parseXml() {
   fs.readFile("D:/BackEndUni/Lab4/bc2023-4/data.xml", 'UTF-8', (err, xmlData) => {
     if (err) {
@@ -37,8 +41,8 @@ function parseXml() {
     const parsedData = parser.parse(xmlData);
     const banksincexpElements = parsedData.indicators.banksincexp;
     
-    const incomeTotalElement = banksincexpElements.find((item) => item.id_api === 'BS2_IncomeTotal');
-    const OutComeTotalElemnt = banksincexpElements.find((item) => item.id_api === 'BS2_ExpensesTotal');
+    const incomeTotalElement = filterXmlData(banksincexpElements ,"id_api" ,"BS2_IncomeTotal");
+    const OutComeTotalElemnt = filterXmlData(banksincexpElements ,"id_api", "BS2_ExpensesTotal");
     let responce = buildResponse (incomeTotalElement , OutComeTotalElemnt);
       console.log(responce);
     return responce;
@@ -55,7 +59,7 @@ function parseXml() {
 
 //http://localhost:8000
 const requestListener = function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'application/xml' });
+  res.setHeader('Content-Type', 'application/xml');
 
   parseXml((err, response) => {
     if (err) {
