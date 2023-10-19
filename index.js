@@ -59,7 +59,6 @@ function parseXml() {
 
 //http://localhost:8000
 const requestListener = function (req, res) {
-  res.setHeader('Content-Type', 'application/xml');
 
   parseXml((err, response) => {
     if (err) {
